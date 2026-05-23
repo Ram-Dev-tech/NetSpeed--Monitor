@@ -1,0 +1,189 @@
+<Window x:Class="NetSpeedOverlay.FlyoutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Network Meter Flyout" 
+        Width="270" 
+        Height="295" 
+        WindowStyle="None" 
+        ResizeMode="NoResize" 
+        ShowInTaskbar="False"
+        Topmost="True" 
+        Background="Transparent"
+        Deactivated="Window_Deactivated"
+        Loaded="Window_Loaded">
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" ResizeBorderThickness="0" GlassFrameThickness="-1" />
+    </WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <!-- Menu Button Style mimicking the native macOS/Windows 11 hover menus -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Border" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="5" 
+                                Padding="{TemplateBinding Padding}"
+                                Margin="8,1">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#15FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#25FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="#E61C1C1E" 
+            BorderBrush="#25FFFFFF" 
+            BorderThickness="1" 
+            CornerRadius="12">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Top interface bar -->
+                <RowDefinition Height="Auto" /> <!-- Divider -->
+                <RowDefinition Height="Auto" /> <!-- Speeds and totals -->
+                <RowDefinition Height="Auto" /> <!-- Divider -->
+                <RowDefinition Height="*" />    <!-- Menu items -->
+            </Grid.RowDefinitions>
+
+            <!-- Top bar -->
+            <Grid Margin="12,10,12,6">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Neon Green Status Dot -->
+                    <Ellipse Width="6" Height="6" Fill="#30D158" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Name="TxtInterface" 
+                               Text="en0 • 127.0.0.1" 
+                               Foreground="#8E8E93" 
+                               FontSize="10.5" 
+                               FontFamily="Segoe UI Variable Text, Segoe UI" 
+                               FontWeight="Bold" 
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Divider -->
+            <Border Grid.Row="1" Height="1" Background="#15FFFFFF" Margin="10,0"/>
+
+            <!-- Speeds grid -->
+            <Grid Grid.Row="2" Margin="12,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- DOWNLOAD Column -->
+                <StackPanel Margin="6,0">
+                    <TextBlock Text="DOWNLOAD" 
+                               Foreground="#8E8E93" 
+                               FontSize="8.5" 
+                               FontFamily="Segoe UI Variable Small, Segoe UI" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,3"/>
+                    <TextBlock Name="TxtDlSpeed" 
+                               Text="0.0 KB/s" 
+                               Foreground="#30D158" 
+                               FontSize="19" 
+                               FontFamily="Segoe UI Variable Display, Segoe UI" 
+                               FontWeight="Bold"/>
+                    <TextBlock Name="TxtDlTotal" 
+                               Text="Total: 0.00 MB" 
+                               Foreground="#8E8E93" 
+                               FontSize="9.5" 
+                               FontFamily="Segoe UI Variable Small, Segoe UI" 
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+
+                <!-- Vertical Separator -->
+                <Border Grid.Column="1" Width="1" Height="46" Background="#15FFFFFF" VerticalAlignment="Center"/>
+
+                <!-- UPLOAD Column -->
+                <StackPanel Grid.Row="0" Grid.Column="2" Margin="12,0,4,0">
+                    <TextBlock Text="UPLOAD" 
+                               Foreground="#8E8E93" 
+                               FontSize="8.5" 
+                               FontFamily="Segoe UI Variable Small, Segoe UI" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,3"/>
+                    <TextBlock Name="TxtUlSpeed" 
+                               Text="0.0 KB/s" 
+                               Foreground="#FF9F0A" 
+                               FontSize="19" 
+                               FontFamily="Segoe UI Variable Display, Segoe UI" 
+                               FontWeight="Bold"/>
+                    <TextBlock Name="TxtUlTotal" 
+                               Text="Total: 0.00 MB" 
+                               Foreground="#8E8E93" 
+                               FontSize="9.5" 
+                               FontFamily="Segoe UI Variable Small, Segoe UI" 
+                               Margin="0,3,0,0"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Divider -->
+            <Border Grid.Row="3" Height="1" Background="#15FFFFFF" Margin="10,0"/>
+
+            <!-- Menu list -->
+            <StackPanel Grid.Row="4" Margin="0,4,0,8">
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnRefresh_Click">
+                    <Grid>
+                        <TextBlock Text="Refresh Interval" VerticalAlignment="Center"/>
+                        <TextBlock Text="&#xE974;" FontFamily="Segoe MDL2 Assets" FontSize="7" Foreground="#55FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnUnits_Click">
+                    <Grid>
+                        <TextBlock Text="Display Units" VerticalAlignment="Center"/>
+                        <TextBlock Text="&#xE974;" FontFamily="Segoe MDL2 Assets" FontSize="7" Foreground="#55FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnPosition_Click">
+                    <Grid>
+                        <TextBlock Text="Overlay Position" VerticalAlignment="Center"/>
+                        <TextBlock Text="&#xE974;" FontFamily="Segoe MDL2 Assets" FontSize="7" Foreground="#55FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+
+                <Border Height="1" Background="#15FFFFFF" Margin="10,4"/>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnReset_Click">
+                    <TextBlock Text="Reset Session Statistics" VerticalAlignment="Center"/>
+                </Button>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnAbout_Click">
+                    <TextBlock Text="About Network Meter" VerticalAlignment="Center"/>
+                </Button>
+
+                <Border Height="1" Background="#15FFFFFF" Margin="10,4"/>
+
+                <Button Style="{StaticResource MenuButtonStyle}" Click="BtnQuit_Click">
+                    <Grid>
+                        <TextBlock Text="Quit Network Meter" VerticalAlignment="Center"/>
+                        <!-- Shortcut display mimicking macOS/Win11 -->
+                        <TextBlock Text="Alt+F4" FontSize="9.5" FontFamily="Segoe UI Variable Text, Segoe UI" Foreground="#55FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

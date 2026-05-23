@@ -1,0 +1,86 @@
+<Application x:Class="NetSpeedOverlay.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Shared Dark ContextMenu Styles -->
+        <Style TargetType="{x:Type ContextMenu}">
+            <Setter Property="Background" Value="#1E1E1E" />
+            <Setter Property="BorderBrush" Value="#33FFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContextMenu}">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="2">
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type MenuItem}">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                        <Border Name="Bg" 
+                                Background="Transparent" 
+                                CornerRadius="4" 
+                                Padding="8,4" 
+                                Margin="2,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="SubMenu" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Checkmark/Icon -->
+                                <ContentPresenter Name="Icon" ContentSource="Icon" Width="12" Height="12" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                <TextBlock Name="CheckMark" Text="✓" Foreground="#60CDFF" Visibility="Collapsed" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="Bold"/>
+                                
+                                <!-- Header -->
+                                <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center" Margin="4,0,12,0"/>
+                                
+                                <!-- Submenu indicator -->
+                                <TextBlock Name="Arrow" Grid.Column="2" Text="▶" Foreground="#88FFFFFF" FontSize="8" Margin="8,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                
+                                <Popup Name="SubMenuPopup" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" Focusable="False" AllowsTransparency="True">
+                                    <Border Background="#1E1E1E" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="8" Padding="2" Margin="4,0">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#2AFFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Icon" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="True">
+                                <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SeparatorStyle" TargetType="{x:Type Separator}">
+            <Setter Property="Background" Value="#1AFFFFFF" />
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Margin" Value="4,4,4,4" />
+        </Style>
+    </Application.Resources>
+</Application>
